@@ -1,0 +1,220 @@
+
+
+{% extends 'base.html'%}
+{%load static %}
+{% load crispy_forms_tags %}
+{%block content%}
+
+<link href="https://cdn.jsdelivr.net/npm/smartwizard@5/dist/css/smart_wizard_all.min.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="{%static 'css/profile.css'%}">
+<!-- JavaScript -->
+
+<script src="https://cdn.jsdelivr.net/npm/smartwizard@5/dist/js/jquery.smartWizard.min.js" type="text/javascript"></script>
+
+
+
+<div id="smartwizard" class="container">
+    <ul class="nav">
+       <li>
+           <a class="nav-link" href="#step-1">
+              Personal Info
+           </a>
+       </li>
+       <li>
+           <a class="nav-link" href="#step-2">
+              Company Info
+           </a>
+       </li>
+       <li>
+           <a class="nav-link" href="#step-3">
+              Upload Required Documents
+           </a>
+       </li>
+
+       <li>
+        <a class="nav-link" href="#step-4">
+           Submit Profile
+        </a>
+    </li>
+      
+    </ul>
+ 
+    <div class="tab-content">
+       
+       <div id="step-1" class="tab-pane" role="tabpanel">
+           
+        <div class="container-fluid px-1 py-3 mx-auto">
+            <div class="row d-flex justify-content-center">
+                <div class="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
+                    <h3>Registration</h3>
+                    <p class="blue-text">Enter your details</p>
+                    <div class="card">
+                        <h5 class="text-center mb-4">Emowering and Revolutionizing the worlds perspective</h5>
+                        <form class="form-card" onsubmit="event.preventDefault()">
+                            {%csrf_token %}
+                            {{form.first_name|as_crispy_field}}
+                            {{form.last_name|as_crispy_field}}
+                            {{form.user_name|as_crispy_field}}
+                            {{form.email_id|as_crispy_field}}
+                            {{form.password|as_crispy_field}}
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+       </div>
+       <div id="step-2" class="tab-pane" role="tabpanel">
+           <div class="container-fluid px-1 py-3 mx-auto">
+            <div class="row d-flex justify-content-center">
+                <div class="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
+                    <h3>Some text</h3>
+                    <p class="blue-text">User Info</p>
+                    <div class="card">
+                        <h5 class="text-center mb-4">Emowering and Revolutionizing the worlds perspective</h5>
+                        <form class="form-card" onsubmit="event.preventDefault()">
+                            {%csrf_token %}
+                            {{form.firm_name|as_crispy_field}}
+                            {{form.firm_type|as_crispy_field}}
+                            {{form.PAN|as_crispy_field}}
+                            {{form.GST|as_crispy_field}}
+                            {{form.authorized_person_firstname|as_crispy_field}}
+                            {{form.authorized_person_lastname|as_crispy_field}}
+                            {{form.registered_address_of_company|as_crispy_field}}
+                            {{form.email_id_of_autherized_person|as_crispy_field}}
+                            {{form.mobile_number|as_crispy_field}}
+                           
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+       </div>
+       <div id="step-3" class="tab-pane" role="tabpanel">
+        <div class="container-fluid px-1 py-3 mx-auto">
+            <div class="row d-flex justify-content-center">
+                <div class="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
+                    <h3>Some text</h3>
+                    <p class="blue-text">Some more texts.</p>
+                    <div class="card">
+                        <h5 class="text-center mb-4">Emowering and Revolutionizing the worlds perspective</h5>
+                        <form class="form-card" onsubmit="event.preventDefault()">
+                            {%csrf_token %}
+                            {{formlead.authority_letter|as_crispy_field}}
+                            {{formlead.photo_of_authorized_person|as_crispy_field}}
+                            {{formlead.gst_document|as_crispy_field}}
+                            {{formlead.pan_photo|as_crispy_field}}
+                            {{formlead.client_credential_file|as_crispy_field}}
+                            <input type="hidden" id="depos" value=100000000>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       </div>
+        
+       <div id="step-4" class="tab-pane" role="tabpanel">
+           <form action="" method="post" onsubmit="event.preventDefault()">
+            {% csrf_token %}
+               <button type=submit id="mybtn">Submit</button>
+           </form>
+       </div>
+
+    </div>
+</div>
+
+<script>
+        $(document).ready(function(){
+     $('#depos').val('5000000')
+     // SmartWizard initialize
+     //$('#smartwizard').smartWizard();
+    
+     let isemptyinput = false;
+     var formData = new FormData();
+     $('#mybtn').click(function(){
+            $('input[type=text]').each(function(){
+               if( $(this).val()==""){isemptyinput=true}
+
+            })
+               
+               if(!isemptyinput)     
+                $("input[name]").each(function (index, node) {
+                    if(node.type=='file'){formData.append(node.name,node.files[0]); console.log(node.files[0]);console.log(node.name);console.log(node.value)}else
+                    
+                    formData.append(node.name,node.value);
+                       
+                       
+                    });
+               
+           
+           
+            console.log(...formData)
+           
+            if(!isemptyinput && formData){
+                    $.ajax({
+            url: "/create",
+            enctype: "multipart/form-data",
+            type: "post",
+            data: formData,
+            contentType: false,
+        processData: false, 
+        cache: false,
+            }).done(function(data) {
+            alert('submitted successfully');
+            });
+     }
+
+     });
+
+ 
+     
+
+     $('#smartwizard').smartWizard({
+      selected: 0, // Initial selected step, 0 = first step
+      theme: 'progress', // theme for the wizard, related css need to include for other than default theme
+      justified: true, // Nav menu justification. true/false
+      darkMode:false, // Enable/disable Dark Mode if the theme supports. true/false
+      autoAdjustHeight: true, // Automatically adjust content height
+      cycleSteps: false, // Allows to cycle the navigation of steps
+      backButtonSupport: true, // Enable the back button support
+      enableURLhash: true, // Enable selection of the step based on url hash
+      transition: {
+          animation: 'slide-horizontal', // Effect on navigation, none/fade/slide-horizontal/slide-vertical/slide-swing
+          speed: '400', // Transion animation speed
+          easing:'' // Transition animation easing. Not supported without a jQuery easing plugin
+      },
+      toolbarSettings: {
+          toolbarPosition: 'bottom', // none, top, bottom, both
+          toolbarButtonPosition: 'right', // left, right, center
+          showNextButton: true, // show/hide a Next button
+          showPreviousButton: true, // show/hide a Previous button
+          toolbarExtraButtons: [] // Extra buttons to show on toolbar, array of jQuery input/buttons elements
+      },
+      anchorSettings: {
+          anchorClickable: true, // Enable/Disable anchor navigation
+          enableAllAnchors: false, // Activates all anchors clickable all times
+          markDoneStep: true, // Add done state on navigation
+          markAllPreviousStepsAsDone: true, // When a step selected by url hash, all previous steps are marked done
+          removeDoneStepOnNavigateBack: false, // While navigate back done step after active step will be cleared
+          enableAnchorOnDoneStep: true // Enable/Disable the done steps navigation
+      },
+      keyboardSettings: {
+          keyNavigation: true, // Enable/Disable keyboard navigation(left and right keys are used if enabled)
+          keyLeft: [37], // Left key code
+          keyRight: [39] // Right key code
+      },
+      lang: { // Language variables for button
+          next: 'Next',
+          previous: 'Previous'
+      },
+      disabledSteps: [], // Array Steps disabled
+      errorSteps: [], // Highlight step with errors
+      hiddenSteps: [] // Hidden steps
+    });
+
+    
+   });
+</script>
+
+{%endblock content%}

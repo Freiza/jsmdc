@@ -1,0 +1,118 @@
+{% extends 'base.html'%}
+{%load static %}
+{%block content%}
+<div class="card">
+  <div class="card-body">
+<div class="form-group">
+  <label for="usr">Balance:</label>
+  <input type="text" class="form-control" id="usr" value={{deposit}} readonly>
+</div>
+  </div>
+</div>
+<link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/2.10.0/themes/tabulator_modern.min.css" rel="stylesheet">
+
+<script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+
+<div class="fcontainer">
+    <div id="example-table"></div>
+    <button id="myclick" class="btn btn-danger">Select Marked</button>
+    <hr>
+    <div class="row d-flex justify-content-center flex-nowrap">
+        <table class="table table-bordered table-sm w-75" id="hids" style="background-color:lavender;"></table>
+       
+    </div>
+    <button id="upload" class="btn btn-danger">Save Selection</button>
+</div>
+
+
+
+<script>
+var marr=[];
+var deposit = parseInt({{deposit}});
+var flag_ismoneyfinished = false;
+let g = $('#myclick').click(function () {
+  var selectedRows = table.getSelectedRows(); 
+  $('#hids').empty();
+  deposit=parseInt({{deposit}});
+  $('#usr').val(deposit);
+  $(selectedRows).each(function(i,v){
+    
+    deposit-=500000
+
+    if(deposit<0){
+      flag_ismoneyfinished=true;
+    }
+    $('#usr').val(deposit);
+  });
+  if(!flag_ismoneyfinished)
+          $(selectedRows).each(function(i,v){
+            l = v.getData();
+            console.log(l.id,l.mauza,l.id);
+            marr.push(l.id);
+            
+            let m=$(`<tr scope="row" ></tr>`);
+
+            let n = $(`
+          
+                                                        <td>${l.id}</td>
+                                                        <td>${l.mauza}</td>
+                                                        <td>${l.location}</td>
+                                                        <td>${l.district}</td>
+                                                        <td>${l.area}</td>
+                                                        <td>${l.qtycft}</td>
+                                                        <td>${l.emd}</td>
+                                                        
+          
+                                                  `);
+            m.append(n);
+            $('#hids').append(m);
+
+          })
+          
+  //let k = $('#hids').text(selectedData);
+});
+
+var tabledata = [
+{% for sand in sands %}
+ {id:"{{sand.id}}", mauza:"{{sand.mauza}}", location:"{{sand.location}}", district:"{{sand.district}}", area:"{{sand.area}}", qtycft:"{{sand.qtycft}}", emd:"{{sand.emd}}"},
+{% endfor %}
+];
+
+var table = new Tabulator("#example-table", {
+    height:"311px",
+    layout:"fitColumns",
+    responsiveLayout:"collapse",
+    data:tabledata,
+    cellHozAlign:"center",
+    headerHozAlign:"center",
+    columns:[
+    {formatter:"rowSelection", titleFormatter:"rowSelection", hozAlign:"center", headerSort:false, cellClick:function(e, cell){
+        cell.getRow().toggleSelect();
+      }},
+        {title:"ID", field:"id", width:150,sorter:"number", headerFilter:"number"},
+        {title:"Mauza", field:"mauza", width:150,  headerFilter:"input"},
+        {title:"Location", field:"location",  headerFilter:"input"},
+        {title:"District", field:"district",  headerFilter:"input"},
+        {title:"Area (Ha)", field:"area",  sorter:"number",headerFilter:"number"},
+        {title:"Qty. in CFT", field:"qtycft", sorter:"number",headerFilter:"number"},
+        {title:"EMD", field:"emd", sorter:"number",headerFilter:"number"}
+    ],
+});
+
+
+
+$('#upload').click(function(){
+  $.ajax({
+  method: "POST",
+  url: "/wallet",
+  data: { 'marrd':marr,csrfmiddlewaretoken: '{{ csrf_token }}' }
+})
+  .done(function( msg ) {
+    alert( "Data Saved: " );
+  });
+
+}); 
+</script>
+
+{%endblock content%}
