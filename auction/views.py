@@ -183,6 +183,7 @@ def forgot_password(request):
         print(o)
         o.set_password(upass)
         o.save()
+        l="love"
         return render(request,"login.html")
     return render(request,"forgotpass.html")
 
